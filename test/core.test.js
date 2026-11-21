@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {makeRow,seeded,validateRows,MODES,loadSave,dailySeed} from '../src/core.js';
+test('dez trilhos e rotas alcançáveis em muitas sementes e modos',()=>{for(const mode of Object.keys(MODES))for(let seed=0;seed<100;seed++){const random=seeded(seed);let safe=4;const rows=Array.from({length:200},()=>{const row=makeRow(random,safe,1,mode);assert.ok(Math.abs(row.safe-safe)<=1);safe=row.safe;assert.ok(row.obstacles.every(o=>o.lane>=0&&o.lane<10&&o.lane!==safe));return row});assert.ok(validateRows(rows))}});
+test('sequência reproduzível',()=>{const a=seeded(42),b=seeded(42);assert.deepEqual(Array.from({length:100},()=>a()),Array.from({length:100},()=>b()));assert.equal(dailySeed(new Date('2026-11-21T00:00:00Z')),20261121)});
+test('salvamento tolera dados inválidos',()=>{assert.equal(loadSave({getItem:()=>'{'}).coins,0);assert.equal(loadSave({getItem:()=>'{"coins":42}'}).coins,42)});
